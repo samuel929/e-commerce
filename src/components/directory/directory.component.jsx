@@ -1,5 +1,6 @@
 import React from 'react'
 import CategoryItem from '../categoryitem/category-item';
+import {Outlet} from 'react-router-dom';
 import './directory.scss'
 export default function Directorycomponent() {
     const categories=[
@@ -30,10 +31,13 @@ export default function Directorycomponent() {
         }
       ]
   return (
-    <div className='categories-container'>
+    <div>
+     <Outlet/>
+    <div className='categories-container'>  
       {categories.map((item)=>(
        <CategoryItem  key={item.id} category={item}/>
       ))}
+    </div>
     </div>
   )
 }
