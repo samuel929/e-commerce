@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import {getAuth,signInWithRedirect,signInWithPopup,GoogleAuthProvider} from 'firebase/auth'
+import {getAuth,signInWithRedirect,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword} from 'firebase/auth'
 import {getFirestore,doc,getDoc,setDoc} from 'firebase/firestore'
 const firebaseConfig = {
   apiKey: "AIzaSyBTUNTFh0EF18xwTIPflqJ7Yd_Sxxd-EGQ",
@@ -24,8 +24,9 @@ export const auth=getAuth();
 export const signInWithGooglePopUp=()=>signInWithPopup(auth,provider);
 export const db=getFirestore();
 
-export const createUserDocumentFromAuth=async(userAuth)=>{
+export const createUserDocumentFromAuth=async(userAuth,additionalInfo)=>{
     //Creating a document
+    if(!userAuth) return;
     const userDocRef=doc(db,'users',userAuth.uid)
 
     console.log(userDocRef)
@@ -37,12 +38,16 @@ export const createUserDocumentFromAuth=async(userAuth)=>{
         const createAt= new Date();
         try{
             await setDoc(userDocRef,{
-                displayname:displayName,
+                displayName:displayName,
                 email:email,
-                createAt
-            })          
+                createAt,
+                ...additionalInfo
+            })  
+                    
         }catch(err){
-            console.log(err.message)
+           if(err.code === 'auth/email-already-in-use'){
+               alert("Email already in use")
+           }
            throw err
         }
     }
@@ -52,4 +57,10 @@ export const createUserDocumentFromAuth=async(userAuth)=>{
     //if user data doesnt exist
 
     //return userDoc
+}
+
+export const createAuthUserWithEmailAndPassword=async(email,password)=>{
+    
+    if(!email || !password) return;
+    return await createUserWithEmailAndPassword(auth,email,password)
 }
